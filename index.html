@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flourish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:    #F7F2EA;
+    --parchment:#EDE3D0;
+    --clay:     #B8845A;
+    --terra:    #8F5B35;
+    --moss:     #5E7A52;
+    --sage:     #91A882;
+    --leaf:     #3D5C33;
+    --bark:     #4A3728;
+    --charcoal: #2E2820;
+    --mist:     #FDFAF5;
+    --warm-mid: #C9A87C;
+    --shadow:   rgba(74,55,40,0.10);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body:    'DM Sans', sans-serif;
+    --radius-card:  16px;
+    --radius-pill:  99px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--charcoal);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 15% 0%, rgba(184,132,90,0.13) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 85% 100%, rgba(94,122,82,0.11) 0%, transparent 60%);
+  }
+
+  /* ── Auth Screen ── */
+  #authScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem;
+  }
+  .auth-logo {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    color: var(--bark);
+    letter-spacing: 0.03em;
+    text-align: center;
+  }
+  .auth-logo span { color: var(--clay); }
+  .auth-tagline {
+    font-size: 0.9rem;
+    color: var(--warm-mid);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: -1.5rem;
+  }
+  .auth-card {
+    background: var(--mist);
+    border: 1.5px solid var(--parchment);
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+    box-shadow: 0 8px 40px var(--shadow);
+  }
+  .auth-card h2 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--bark);
+    margin-bottom: 0.5rem;
+  }
+  .auth-card p { font-size: 0.85rem; color: #9a8070; margin-bottom: 1.5rem; }
+  .google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    width: 100%;
+    padding: 0.85rem 1.2rem;
+    background: var(--bark);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .google-btn:hover { background: var(--charcoal); }
+  .google-btn:active { transform: scale(0.98); }
+  .google-icon { width: 18px; height: 18px; }
+
+  /* ── Household Setup ── */
+  #householdScreen {
+    min-height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem;
+  }
+  #householdScreen .auth-logo { font-size: 2.5rem; }
+  .household-card {
+    background: var(--mist);
+    border: 1.5px solid var(--parchment);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 40px var(--shadow);
+  }
+  .household-card h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--bark);
+    margin-bottom: 0.4rem;
+  }
+  .household-card p { font-size: 0.83rem; color: #9a8070; margin-bottom: 1.2rem; }
+  .hs-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--clay);
+    font-weight: 700;
+    display: block;
+    margin-bottom: 0.35rem;
+    margin-top: 0.9rem;
+  }
+  .hs-input {
+    width: 100%;
+    border: 1.5px solid var(--parchment);
+    background: #fff;
+    border-radius: 10px;
+    padding: 0.6rem 0.9rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--charcoal);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .hs-input:focus { border-color: var(--clay); }
+  .hs-btn {
+    width: 100%;
+    margin-top: 1.1rem;
+    padding: 0.75rem;
+    background: var(--clay);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .hs-btn:hover { background: var(--terra); }
+  .hs-btn.secondary {
+    background: none;
+    border: 1.5px solid var(--clay);
+    color: var(--clay);
+    margin-top: 0.6rem;
+  }
+  .hs-btn.secondary:hover { background: var(--parchment); }
+  .divider {
+    display: flex; align-items: center; gap: 0.8rem;
+    margin: 1.2rem 0 0.2rem;
+    color: #c4a88a; font-size: 0.78rem;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--parchment);
+  }
+  .invite-code-display {
+    background: var(--parchment);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    margin-top: 0.8rem;
+  }
+  .invite-code-display .code {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    letter-spacing: 0.18em;
+    color: var(--bark);
+    font-weight: 600;
+  }
+  .invite-code-display p { font-size: 0.78rem; color: #9a8070; margin-top: 0.3rem; }
+
+  /* ── App Shell ── */
+  #appShell { display: none; flex-direction: column; min-height: 100vh; }
+
+  /* ── Top bar ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1.5px solid var(--parchment);
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: rgba(247,242,234,0.85);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .app-logo {
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    color: var(--bark);
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+  .app-logo span { color: var(--clay); }
+
+  .mode-tabs {
+    display: flex;
+    background: var(--parchment);
+    border-radius: var(--radius-pill);
+    padding: 3px;
+    gap: 2px;
+  }
+  .mode-tab {
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-pill);
+    border: none;
+    background: none;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: #9a8070;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mode-tab.active { background: var(--bark); color: #fff; }
+
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--clay);
+  }
+  .avatar-placeholder {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--clay);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .sign-out-btn {
+    background: none;
+    border: 1.5px solid var(--parchment);
+    color: #9a8070;
+    border-radius: var(--radius-pill);
+    padding: 0.3rem 0.8rem;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .sign-out-btn:hover { border-color: var(--clay); color: var(--clay); }
+
+  /* ── Progress bar ── */
+  .progress-bar-wrap {
+    padding: 0.6rem 1.5rem;
+    background: var(--parchment);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #e0d0bb;
+  }
+  .streak-pill {
+    display: flex; align-items: center; gap: 0.35rem;
+    background: var(--clay); color: #fff;
+    border-radius: var(--radius-pill);
+    padding: 0.25rem 0.8rem;
+    font-size: 0.75rem; font-weight: 700;
+  }
+  .progress-group {
+    flex: 1; min-width: 140px;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .progress-track {
+    flex: 1; height: 5px;
+    background: #ddd0bb; border-radius: var(--radius-pill); overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--clay), var(--moss));
+    border-radius: var(--radius-pill);
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-label { font-size: 0.73rem; color: var(--bark); font-weight: 700; white-space: nowrap; }
+
+  .my-tasks-toggle {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 0.4rem;
+    font-size: 0.78rem; color: var(--bark); cursor: pointer;
+    background: none; border: 1.5px solid var(--clay);
+    border-radius: var(--radius-pill); padding: 0.25rem 0.8rem;
+    font-family: var(--font-body); font-weight: 700;
+    transition: background 0.2s, color 0.2s;
+  }
+  .my-tasks-toggle.active { background: var(--clay); color: #fff; border-color: var(--clay); }
+
+  /* ── Main layout ── */
+  .app-body {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 0;
+    flex: 1;
+    align-items: start;
+  }
+  @media (max-width: 680px) { .app-body { grid-template-columns: 1fr; } }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    border-right: 1.5px solid var(--parchment);
+    padding: 1.5rem 1rem;
+    position: sticky;
+    top: 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .sidebar-heading {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warm-mid);
+    font-weight: 700;
+    padding: 0 0.5rem;
+    margin-bottom: 0.3rem;
+  }
+  .sidebar-btn {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: 11px;
+    border: none; background: none;
+    font-family: var(--font-body); font-size: 0.86rem;
+    color: var(--charcoal); cursor: pointer;
+    transition: background 0.15s;
+    text-align: left;
+  }
+  .sidebar-btn:hover { background: var(--parchment); }
+  .sidebar-btn.active { background: var(--bark); color: #fff; font-weight: 700; }
+  .sidebar-icon { font-size: 1rem; width: 1.3rem; text-align: center; flex-shrink: 0; }
+  .sidebar-count {
+    margin-left: auto; font-size: 0.7rem;
+    background: rgba(184,132,90,0.2); color: var(--terra);
+    border-radius: var(--radius-pill); padding: 0.1rem 0.45rem; font-weight: 700;
+  }
+  .sidebar-btn.active .sidebar-count { background: rgba(255,255,255,0.2); color: #fff; }
+
+  .sidebar-add-btn {
+    margin-top: 0.4rem;
+    background: none; border: 1.5px dashed var(--warm-mid);
+    color: var(--clay); border-radius: 11px;
+    padding: 0.5rem 0.7rem;
+    font-family: var(--font-body); font-size: 0.8rem;
+    cursor: pointer; text-align: left;
+    transition: background 0.2s;
+  }
+  .sidebar-add-btn:hover { background: var(--parchment); }
+
+  /* ── Content area ── */
+  .content { padding: 1.5rem 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
+  @media (max-width: 680px) { .content { padding: 1rem; } }
+
+  /* ── Rotation banner ── */
+  .rotation-banner {
+    background: linear-gradient(135deg, var(--parchment) 0%, #f0e8d8 100%);
+    border: 1.5px solid #ddd0b8;
+    border-radius: var(--radius-card);
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .rotation-info { display: flex; flex-direction: column; gap: 0.2rem; }
+  .rotation-info .label {
+    font-size: 0.68rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--clay); font-weight: 700;
+  }
+  .rotation-info .assigned {
+    font-family: var(--font-display); font-size: 1.2rem; color: var(--bark);
+  }
+  .swap-btn {
+    background: var(--clay); color: #fff;
+    border: none; border-radius: var(--radius-pill);
+    padding: 0.4rem 1rem; font-family: var(--font-body);
+    font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .swap-btn:hover { background: var(--terra); }
+
+  /* ── Freq section ── */
+  .freq-header {
+    display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.7rem;
+  }
+  .freq-badge {
+    font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 700; padding: 0.2rem 0.7rem; border-radius: var(--radius-pill);
+  }
+  .freq-badge.daily   { background: #fce8d5; color: #8f5b35; }
+  .freq-badge.weekly  { background: #dff0e0; color: #3d5c33; }
+  .freq-badge.monthly { background: #e0e8f0; color: #3b5998; }
+  .freq-badge.custom  { background: #f0e0f0; color: #7a4a8a; }
+  .freq-line { flex: 1; height: 1px; background: var(--parchment); }
+
+  /* ── Task card ── */
+  .task-card {
+    background: var(--mist);
+    border: 1.5px solid var(--parchment);
+    border-radius: var(--radius-card);
+    padding: 0.8rem 1rem;
+    display: flex; align-items: center; gap: 0.8rem;
+    margin-bottom: 0.45rem;
+    transition: box-shadow 0.2s, border-color 0.2s, opacity 0.3s;
+  }
+  .task-card:hover { box-shadow: 0 3px 14px var(--shadow); border-color: #d4b89a; }
+  .task-card.done { opacity: 0.5; }
+  .task-card.done .task-name { text-decoration: line-through; color: #bbb; }
+  .task-card.mine { border-left: 3px solid var(--clay); }
+  .task-card.theirs { border-left: 3px solid var(--sage); }
+  .task-card.shared { border-left: 3px solid var(--warm-mid); }
+  .task-card.dimmed { opacity: 0.45; }
+
+  .task-check {
+    width: 21px; height: 21px;
+    border: 2px solid var(--clay);
+    border-radius: 6px; flex-shrink: 0;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s; background: #fff;
+  }
+  .task-check.checked { background: var(--clay); border-color: var(--clay); }
+  .task-check.checked::after { content: '✓'; color: #fff; font-size: 0.8rem; font-weight: 700; }
+
+  .task-info { flex: 1; min-width: 0; }
+  .task-name { font-size: 0.88rem; }
+  .task-meta { font-size: 0.7rem; color: #b09070; margin-top: 0.1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .tag { border-radius: var(--radius-pill); padding: 0.1rem 0.5rem; font-size: 0.67rem; font-weight: 700; }
+  .tag.assign-me    { background: rgba(184,132,90,0.15); color: var(--terra); }
+  .tag.assign-them  { background: rgba(94,122,82,0.15); color: var(--leaf); }
+  .tag.assign-share { background: rgba(201,168,124,0.2); color: #7a6040; }
+  .tag.snoozed      { background: #f0e8d8; color: #9a8060; }
+  .tag.overdue      { background: #fde8e8; color: #c04040; }
+
+  .task-actions { display: flex; gap: 0.3rem; }
+  .icon-btn {
+    background: none; border: none; cursor: pointer;
+    padding: 0.28rem; border-radius: 7px;
+    font-size: 0.85rem; color: #c4a080;
+    transition: background 0.15s, color 0.15s;
+  }
+  .icon-btn:hover { background: var(--parchment); color: var(--bark); }
+
+  /* ── Plant card ── */
+  .plant-card {
+    background: var(--mist);
+    border: 1.5px solid var(--parchment);
+    border-radius: var(--radius-card);
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.5rem;
+    display: flex; align-items: center; gap: 1rem;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .plant-card:hover { box-shadow: 0 3px 14px var(--shadow); border-color: var(--sage); }
+  .plant-emoji { font-size: 1.8rem; flex-shrink: 0; }
+  .plant-info { flex: 1; min-width: 0; }
+  .plant-name { font-family: var(--font-display); font-size: 1.1rem; color: var(--bark); }
+  .plant-species { font-size: 0.72rem; color: #b09070; font-style: italic; }
+  .plant-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
+  .plant-due { font-size: 0.75rem; font-weight: 700; }
+  .plant-due.ok     { color: var(--moss); }
+  .plant-due.soon   { color: var(--clay); }
+  .plant-due.overdue{ color: #c04040; }
+  .plant-tip { font-size: 0.72rem; color: #9a8070; margin-top: 0.3rem; line-height: 1.4; }
+
+  .water-btn {
+    background: var(--moss); color: #fff;
+    border: none; border-radius: var(--radius-pill);
+    padding: 0.45rem 0.9rem;
+    font-family: var(--font-body); font-size: 0.78rem; font-weight: 700;
+    cursor: pointer; transition: background 0.2s; white-space: nowrap;
+  }
+  .water-btn:hover { background: var(--leaf); }
+
+  /* ── Add task inline ── */
+  .add-task-row { display: flex; gap: 0.5rem; margin-top: 0.2rem; }
+  .add-task-input {
+    flex: 1; border: 1.5px dashed #c4956a66;
+    background: transparent; border-radius: 10px;
+    padding: 0.5rem 0.85rem;
+    font-family: var(--font-body); font-size: 0.83rem; color: var(--charcoal);
+    outline: none; transition: border-color 0.2s;
+  }
+  .add-task-input:focus { border-color: var(--clay); border-style: solid; }
+  .add-task-input::placeholder { color: #c4a585; }
+
+  /* ── Modals ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(46,40,32,0.5); z-index: 100;
+    align-items: center; justify-content: center; padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--mist); border-radius: 20px;
+    padding: 2rem; width: 100%; max-width: 420px;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.2);
+    animation: popIn 0.2s ease; max-height: 90vh; overflow-y: auto;
+  }
+  @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal h2 { font-family: var(--font-display); color: var(--bark); font-size: 1.4rem; margin-bottom: 0.3rem; }
+  .modal p.sub { font-size: 0.82rem; color: #9a8070; margin-bottom: 1rem; }
+  .m-label {
+    font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--clay); font-weight: 700; display: block;
+    margin-bottom: 0.3rem; margin-top: 0.85rem;
+  }
+  .m-input, .m-select {
+    width: 100%; border: 1.5px solid var(--parchment);
+    background: #fff; border-radius: 9px;
+    padding: 0.55rem 0.85rem; font-family: var(--font-body);
+    font-size: 0.88rem; color: var(--charcoal); outline: none;
+    transition: border-color 0.2s;
+  }
+  .m-input:focus, .m-select:focus { border-color: var(--clay); }
+  .m-row { display: flex; gap: 0.6rem; }
+  .m-row > * { flex: 1; }
+  .modal-actions { display: flex; gap: 0.6rem; margin-top: 1.3rem; justify-content: flex-end; flex-wrap: wrap; }
+  .modal-actions button {
+    border: none; border-radius: 9px;
+    padding: 0.55rem 1.2rem;
+    font-family: var(--font-body); font-size: 0.85rem;
+    font-weight: 700; cursor: pointer;
+  }
+  .btn-cancel  { background: var(--parchment); color: var(--bark); }
+  .btn-confirm { background: var(--clay); color: #fff; }
+  .btn-confirm:hover { background: var(--terra); }
+  .btn-danger  { background: #d05050; color: #fff; }
+
+  /* Plant search suggestions */
+  .plant-suggestions {
+    border: 1.5px solid var(--parchment); border-top: none;
+    border-radius: 0 0 10px 10px; background: #fff;
+    max-height: 160px; overflow-y: auto; display: none;
+  }
+  .plant-suggestion {
+    padding: 0.5rem 0.85rem; cursor: pointer;
+    font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem;
+    transition: background 0.15s;
+  }
+  .plant-suggestion:hover { background: var(--parchment); }
+  .plant-suggestion .ps-species { font-size: 0.72rem; color: #9a8070; font-style: italic; }
+
+  /* ── Week end modal ── */
+  .unchecked-list { list-style: none; margin: 0.5rem 0; max-height: 150px; overflow-y: auto; }
+  .unchecked-list li {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.3rem 0; font-size: 0.84rem;
+    border-bottom: 1px solid var(--parchment);
+  }
+  .unchecked-list li:last-child { border: none; }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    background: var(--bark); color: #fff;
+    border-radius: var(--radius-pill); padding: 0.65rem 1.4rem;
+    font-size: 0.82rem; font-weight: 700; letter-spacing: 0.04em;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    z-index: 300; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; }
+
+  /* ── Empty state ── */
+  .empty-state {
+    text-align: center; padding: 3rem 1rem; color: #b09070; font-size: 0.88rem;
+  }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 0.6rem; }
+
+  /* ── Seasonal toggle ── */
+  .seasonal-wrap {
+    display: flex; align-items: center; gap: 0.7rem;
+    padding: 0.7rem 1rem;
+    background: #edf5e8; border: 1.5px solid #c8dfc0;
+    border-radius: var(--radius-card); margin-bottom: 0.5rem;
+    font-size: 0.82rem; color: var(--leaf);
+  }
+  .toggle-switch {
+    position: relative; width: 38px; height: 21px; flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: #c4ddb8; border-radius: var(--radius-pill); cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute;
+    width: 15px; height: 15px; background: #fff;
+    border-radius: 50%; top: 3px; left: 3px;
+    transition: transform 0.2s;
+  }
+  .toggle-switch input:checked + .toggle-slider { background: var(--moss); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(17px); }
+
+  .add-full-btn {
+    align-self: flex-start; margin-top: 0.3rem;
+    background: none; border: 1.5px solid var(--clay);
+    color: var(--clay); border-radius: var(--radius-pill);
+    padding: 0.5rem 1.1rem;
+    font-family: var(--font-body); font-size: 0.82rem; font-weight: 700;
+    cursor: pointer; transition: background 0.2s, color 0.2s;
+  }
+  .add-full-btn:hover { background: var(--clay); color: #fff; }
+  .add-full-btn.green { border-color: var(--moss); color: var(--moss); }
+  .add-full-btn.green:hover { background: var(--moss); color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- ── Auth Screen ── -->
+<div id="authScreen">
+  <div>
+    <div class="auth-logo">Flourish<span>.</span></div>
+    <div class="auth-tagline">Home & Garden, Together</div>
+  </div>
+  <div class="auth-card">
+    <h2>Welcome</h2>
+    <p>Sign in to manage your home with your household.</p>
+    <button class="google-btn" onclick="signInWithGoogle()">
+      <svg class="google-icon" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+  </div>
+</div>
+
+<!-- ── Household Setup Screen ── -->
+<div id="householdScreen" style="display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;padding:2rem;">
+  <div class="auth-logo" style="font-size:2.2rem">Flourish<span style="color:var(--clay)">.</span></div>
+
+  <div class="household-card" id="householdCreate" style="display:block">
+    <h2>Set up your home</h2>
+    <p>Create a household and invite your partner to join.</p>
+    <label class="hs-label">Household name</label>
+    <input class="hs-input" id="householdName" placeholder="e.g. Jake & Em's Place">
+    <button class="hs-btn" onclick="createHousehold()">Create Household</button>
+    <div class="divider">or join an existing one</div>
+    <label class="hs-label">Invite code</label>
+    <input class="hs-input" id="inviteCodeInput" placeholder="6-digit code" maxlength="6" style="text-transform:uppercase;letter-spacing:0.2em;font-size:1.1rem">
+    <button class="hs-btn secondary" onclick="joinHousehold()">Join Household</button>
+  </div>
+
+  <div class="household-card" id="householdJoined" style="display:none">
+    <h2>Household created! 🎉</h2>
+    <p>Share this code with your partner so they can join.</p>
+    <div class="invite-code-display">
+      <div class="code" id="displayedCode">——</div>
+      <p>Your invite code</p>
+    </div>
+    <button class="hs-btn" onclick="enterApp()" style="margin-top:1.2rem">Enter Flourish →</button>
+  </div>
+</div>
+
+<!-- ── App Shell ── -->
+<div id="appShell" style="display:none;flex-direction:column;min-height:100vh">
+
+  <div class="topbar">
+    <div class="app-logo">Flourish<span>.</span></div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tabCleaning" onclick="switchMode('cleaning')">🧹 Cleaning</button>
+      <button class="mode-tab" id="tabPlants" onclick="switchMode('plants')">🌿 Plants</button>
+    </div>
+    <div class="topbar-right">
+      <div id="userAvatar" class="avatar-placeholder">?</div>
+      <button class="sign-out-btn" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="streak-pill">🔥 <span id="streakCount">0</span> wk</div>
+    <div class="progress-group">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-label" id="progressLabel">0 / 0</div>
+    </div>
+    <button class="my-tasks-toggle" id="myTasksBtn" onclick="toggleMyTasks()">👤 My Tasks</button>
+  </div>
+
+  <div class="app-body">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="content" id="content"></main>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ── Modals ── -->
+
+<!-- Snooze -->
+<div class="modal-overlay" id="snoozeModal">
+  <div class="modal">
+    <h2>Snooze Task</h2>
+    <label class="m-label">Snooze until</label>
+    <input type="date" class="m-input" id="snoozeDate">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('snoozeModal')">Cancel</button>
+      <button class="btn-confirm" onclick="confirmSnooze()">Snooze</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Task -->
+<div class="modal-overlay" id="addTaskModal">
+  <div class="modal">
+    <h2>Add Task</h2>
+    <label class="m-label">Task name</label>
+    <input type="text" class="m-input" id="newTaskName" placeholder="e.g. Wipe counters">
+    <label class="m-label">Frequency</label>
+    <select class="m-select" id="newTaskFreq" onchange="toggleCustomDays()">
+      <option value="daily">Daily (every day)</option>
+      <option value="weekly" selected>Weekly (every 7 days)</option>
+      <option value="monthly">Monthly (every 30 days)</option>
+      <option value="custom">Custom interval</option>
+    </select>
+    <div id="customDaysWrap" style="display:none">
+      <label class="m-label">Every how many days?</label>
+      <input type="number" class="m-input" id="newTaskDays" min="1" max="365" placeholder="e.g. 18">
+    </div>
+    <label class="m-label">Assigned to</label>
+    <select class="m-select" id="newTaskAssign">
+      <option value="rotation">Room rotation (default)</option>
+      <option value="me">Always me</option>
+      <option value="them">Always partner</option>
+      <option value="shared">Shared</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('addTaskModal')">Cancel</button>
+      <button class="btn-confirm" onclick="confirmAddTask()">Add Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Room -->
+<div class="modal-overlay" id="addRoomModal">
+  <div class="modal">
+    <h2>Add Room</h2>
+    <label class="m-label">Room name</label>
+    <input type="text" class="m-input" id="newRoomName" placeholder="e.g. Office">
+    <label class="m-label">Icon (emoji)</label>
+    <input type="text" class="m-input" id="newRoomIcon" placeholder="🏠" maxlength="2">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('addRoomModal')">Cancel</button>
+      <button class="btn-confirm" onclick="confirmAddRoom()">Add Room</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Plant -->
+<div class="modal-overlay" id="addPlantModal">
+  <div class="modal">
+    <h2>Add Plant</h2>
+    <label class="m-label">Plant name</label>
+    <div style="position:relative">
+      <input type="text" class="m-input" id="newPlantName" placeholder="Search or type name..." autocomplete="off" oninput="filterPlantSuggestions()" style="border-radius:10px 10px 0 0">
+      <div class="plant-suggestions" id="plantSuggestions"></div>
+    </div>
+    <label class="m-label">Species (optional)</label>
+    <input type="text" class="m-input" id="newPlantSpecies" placeholder="e.g. Monstera deliciosa">
+    <div class="m-row">
+      <div>
+        <label class="m-label">Emoji</label>
+        <input type="text" class="m-input" id="newPlantEmoji" placeholder="🌿" maxlength="2">
+      </div>
+      <div>
+        <label class="m-label">Water every (days)</label>
+        <input type="number" class="m-input" id="newPlantDays" min="1" max="365" placeholder="10">
+      </div>
+    </div>
+    <label class="m-label">Winter interval (days, optional)</label>
+    <input type="number" class="m-input" id="newPlantWinterDays" min="1" max="365" placeholder="Leave blank to use same interval">
+    <label class="m-label">Notes</label>
+    <input type="text" class="m-input" id="newPlantNotes" placeholder="Care tips...">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('addPlantModal')">Cancel</button>
+      <button class="btn-confirm" onclick="confirmAddPlant()">Add Plant</button>
+    </div>
+  </div>
+</div>
+
+<!-- Week-end -->
+<div class="modal-overlay" id="weekEndModal">
+  <div class="modal">
+    <h2>New Week! 🌱</h2>
+    <p class="sub">Completed tasks have been reset. These were <strong>not finished</strong> last week:</p>
+    <ul class="unchecked-list" id="uncheckedList"></ul>
+    <p style="font-size:0.83rem;color:#9a8070;margin-top:0.5rem">What should we do with them?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="handleUnchecked('keep')">Keep as-is</button>
+      <button class="btn-danger" onclick="handleUnchecked('clear')">Mark done</button>
+      <button class="btn-confirm" onclick="handleUnchecked('snooze')">Snooze 3 days</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, arrayUnion, collection }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCBgF2YVyPXiKjxlp1L7m5rGjv2zH_fuzU",
+  authDomain: "flourish-app-88a62.firebaseapp.com",
+  projectId: "flourish-app-88a62",
+  storageBucket: "flourish-app-88a62.firebasestorage.app",
+  messagingSenderId: "770567016162",
+  appId: "1:770567016162:web:109649dc0013be7624d8bb"
+};
+
+const app   = initializeApp(firebaseConfig);
+const auth  = getAuth(app);
+const db    = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+// ── Global state ────────────────────────────────────────────────────────────
+let currentUser  = null;
+let householdId  = null;
+let householdDoc = null;
+let unsubHousehold = null;
+let mode         = 'cleaning';   // 'cleaning' | 'plants'
+let activeRoom   = null;
+let myTasksOnly  = false;
+let seasonalMode = false;
+let snoozeTargetId = null;
+let addTaskRoomId  = null;
+let plantDb      = [];
+
+// Load plant knowledge base
+fetch('plants.json').then(r => r.json()).then(d => { plantDb = d; }).catch(() => {});
+
+// ── Auth ────────────────────────────────────────────────────────────────────
+window.signInWithGoogle = async () => {
+  try { await signInWithPopup(auth, provider); }
+  catch(e) { toast('Sign-in failed: ' + e.message); }
+};
+
+window.signOut = async () => {
+  if (unsubHousehold) unsubHousehold();
+  await fbSignOut(auth);
+  location.reload();
+};
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { show('authScreen'); return; }
+  currentUser = user;
+  renderUserAvatar();
+  const hid = await getUserHousehold(user.uid);
+  if (hid) { householdId = hid; subscribeHousehold(); show('appShell'); }
+  else { show('householdScreen'); }
+});
+
+async function getUserHousehold(uid) {
+  const snap = await getDoc(doc(db, 'users', uid));
+  return snap.exists() ? snap.data().householdId : null;
+}
+
+// ── Household ────────────────────────────────────────────────────────────────
+window.createHousehold = async () => {
+  const name = document.getElementById('householdName').value.trim();
+  if (!name) { toast('Please enter a name.'); return; }
+  const code = Math.random().toString(36).substring(2,8).toUpperCase();
+  const hid  = 'hh_' + Date.now();
+  const defaultRooms = [
+    { id: 'kitchen',  name: 'Kitchen',    icon: '🍳' },
+    { id: 'bathroom', name: 'Bathroom',   icon: '🚿' },
+    { id: 'bedroom',  name: 'Bedroom',    icon: '🛏️' },
+    { id: 'living',   name: 'Living Room',icon: '🛋️' },
+    { id: 'laundry',  name: 'Laundry',   icon: '🧺' },
+  ];
+  const defaultTasks = [
+    { id:'t1', room:'kitchen',  name:'Wipe counters',      freq:'daily',  intervalDays:1,  done:false, snoozedUntil:null, assignOverride:'rotation', lastCompleted:null },
+    { id:'t2', room:'kitchen',  name:'Do dishes',          freq:'daily',  intervalDays:1,  done:false, snoozedUntil:null, assignOverride:'rotation', lastCompleted:null },
+    { id:'t3', room:'kitchen',  name:'Clean stovetop',     freq:'weekly', intervalDays:7,  done:false, snoozedUntil:null, assignOverride:'rotation', lastCompleted:null },
+    { id:'t4', room:'bathroom', name:'Wipe sink & mirror', freq:'weekly', intervalDays:7,  done:false, snoozedUntil:null, assignOverride:'rotation', lastCompleted:null },
+    { id:'t5', room:'bathroom', name:'Scrub toilet',       freq:'weekly', intervalDays:7,  done:false, snoozedUntil:null, assignOverride:'rotation', lastCompleted:null },
+    { id:'t6', room:'bedroom',  name:'Make bed',           freq:'daily',  intervalDays:1,  done:false, snoozedUntil:null, assignOverride:'rotation', lastCompleted:null },
+    { id:'t7', room:'bedroom',  name:'Change bedsheets',   freq:'weekly', intervalDays:7,  done:false, snoozedUntil:null, assignOverride:'rotation', lastCompleted:null },
+    { id:'t8', room:'living',   name:'Vacuum / sweep',     freq:'weekly', intervalDays:7,  done:false, snoozedUntil:null, assignOverride:'rotation', lastCompleted:null },
+    { id:'t9', room:'laundry',  name:'Do a load',          freq:'weekly', intervalDays:7,  done:false, snoozedUntil:null, assignOverride:'rotation', lastCompleted:null },
+    { id:'t10',room:'kitchen',  name:'Clean fridge',       freq:'monthly',intervalDays:30, done:false, snoozedUntil:null, assignOverride:'rotation', lastCompleted:null },
+  ];
+  const data = {
+    name, inviteCode: code,
+    members: [currentUser.uid],
+    userProfiles: { [currentUser.uid]: { name: currentUser.displayName, photo: currentUser.photoURL } },
+    rooms: defaultRooms,
+    tasks: defaultTasks,
+    plants: [],
+    roomRotation: Object.fromEntries(defaultRooms.map(r => [r.id, currentUser.uid])),
+    streak: 0,
+    lastWeekStart: weekStartStr(new Date()),
+    seasonalMode: false,
+    createdAt: new Date().toISOString()
+  };
+  await setDoc(doc(db, 'households', hid), data);
+  await setDoc(doc(db, 'users', currentUser.uid), { householdId: hid });
+  await setDoc(doc(db, 'inviteCodes', code), { householdId: hid });
+  document.getElementById('displayedCode').textContent = code;
+  document.getElementById('householdCreate').style.display = 'none';
+  document.getElementById('householdJoined').style.display = 'block';
+  householdId = hid;
+};
+
+window.joinHousehold = async () => {
+  const code = document.getElementById('inviteCodeInput').value.trim().toUpperCase();
+  if (!code) { toast('Enter an invite code.'); return; }
+  const codeSnap = await getDoc(doc(db, 'inviteCodes', code));
+  if (!codeSnap.exists()) { toast('Code not found.'); return; }
+  const hid = codeSnap.data().householdId;
+  await updateDoc(doc(db, 'households', hid), {
+    members: arrayUnion(currentUser.uid),
+    [`userProfiles.${currentUser.uid}`]: { name: currentUser.displayName, photo: currentUser.photoURL }
+  });
+  await setDoc(doc(db, 'users', currentUser.uid), { householdId: hid });
+  householdId = hid;
+  subscribeHousehold();
+  show('appShell');
+  toast('Joined household!');
+};
+
+window.enterApp = () => { subscribeHousehold(); show('appShell'); };
+
+// ── Firestore subscription ───────────────────────────────────────────────────
+function subscribeHousehold() {
+  if (unsubHousehold) unsubHousehold();
+  unsubHousehold = onSnapshot(doc(db, 'households', householdId), snap => {
+    if (!snap.exists()) return;
+    householdDoc = snap.data();
+    seasonalMode = householdDoc.seasonalMode || false;
+    if (!activeRoom && householdDoc.rooms?.length) activeRoom = householdDoc.rooms[0].id;
+    checkWeekRollover();
+    render();
+  });
+}
+
+async function saveHousehold(updates) {
+  await updateDoc(doc(db, 'households', householdId), updates);
+}
+
+// ── Week logic ───────────────────────────────────────────────────────────────
+function getMondayOf(date) {
+  const d = new Date(date); const day = d.getDay();
+  d.setDate(d.getDate() + (day === 0 ? -6 : 1 - day));
+  d.setHours(0,0,0,0); return d;
+}
+function weekStartStr(d) { return getMondayOf(d).toISOString().split('T')[0]; }
+
+function checkWeekRollover() {
+  if (!householdDoc) return;
+  const thisWeek = weekStartStr(new Date());
+  if (householdDoc.lastWeekStart === thisWeek) return;
+
+  const unchecked = (householdDoc.tasks || []).filter(t =>
+    !t.done && !t.snoozedUntil && (t.freq === 'daily' || t.freq === 'weekly')
+  );
+
+  // Reset tasks
+  const tasks = (householdDoc.tasks || []).map(t => ({ ...t, done: false }));
+
+  // Rotate room assignments
+  const members = householdDoc.members || [];
+  const roomRotation = { ...householdDoc.roomRotation };
+  if (members.length === 2) {
+    (householdDoc.rooms || []).forEach(r => {
+      roomRotation[r.id] = roomRotation[r.id] === members[0] ? members[1] : members[0];
+    });
+  }
+
+  const streak = unchecked.length === 0 ? (householdDoc.streak || 0) + 1 : 0;
+
+  saveHousehold({ tasks, roomRotation, streak, lastWeekStart: thisWeek });
+
+  if (unchecked.length > 0) showWeekEndModal(unchecked);
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function render() {
+  if (!householdDoc) return;
+  renderUserAvatar();
+  renderProgress();
+  if (mode === 'cleaning') { renderSidebar(); renderCleaning(); }
+  else { renderPlantSidebar(); renderPlants(); }
+}
+
+function renderUserAvatar() {
+  const el = document.getElementById('userAvatar');
+  if (!currentUser) return;
+  if (currentUser.photoURL) {
+    el.outerHTML = `<img class="avatar" id="userAvatar" src="${currentUser.photoURL}" alt="You">`;
+  } else {
+    el.textContent = (currentUser.displayName || '?')[0].toUpperCase();
+  }
+}
+
+function renderProgress() {
+  const tasks = householdDoc?.tasks || [];
+  const visible = mode === 'cleaning' ? tasks.filter(t => !activeRoom || t.room === activeRoom) : [];
+  const done = visible.filter(t => t.done).length;
+  const total = visible.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${done} / ${total}`;
+  document.getElementById('streakCount').textContent = householdDoc?.streak || 0;
+  document.getElementById('myTasksBtn').className = 'my-tasks-toggle' + (myTasksOnly ? ' active' : '');
+}
+
+// ── Cleaning sidebar ─────────────────────────────────────────────────────────
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = '<div class="sidebar-heading">Rooms</div>';
+  const rooms = householdDoc?.rooms || [];
+  const tasks = householdDoc?.tasks || [];
+  rooms.forEach(room => {
+    const pending = tasks.filter(t => t.room === room.id && !t.done).length;
+    const btn = document.createElement('button');
+    btn.className = 'sidebar-btn' + (room.id === activeRoom ? ' active' : '');
+    btn.innerHTML = `<span class="sidebar-icon">${room.icon}</span>${room.name}<span class="sidebar-count">${pending}</span>`;
+    btn.onclick = () => { activeRoom = room.id; render(); };
+    sidebar.appendChild(btn);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'sidebar-add-btn';
+  addBtn.textContent = '+ Add Room';
+  addBtn.onclick = openAddRoom;
+  sidebar.appendChild(addBtn);
+}
+
+// ── Cleaning content ─────────────────────────────────────────────────────────
+function renderCleaning() {
+  const content = document.getElementById('content');
+  content.innerHTML = '';
+
+  const tasks  = householdDoc?.tasks || [];
+  const rooms  = householdDoc?.rooms || [];
+  const room   = rooms.find(r => r.id === activeRoom);
+  const members = householdDoc?.members || [];
+  const profiles = householdDoc?.userProfiles || {};
+  const rotation = householdDoc?.roomRotation || {};
+  const myUid  = currentUser.uid;
+  const partnerUid = members.find(m => m !== myUid);
+
+  if (!room) { content.innerHTML = '<div class="empty-state"><div class="empty-icon">🏠</div>Select a room</div>'; return; }
+
+  // Rotation banner
+  const assignedUid = rotation[activeRoom];
+  const isMyRoom    = assignedUid === myUid;
+  const assignedName = assignedUid === myUid
+    ? 'You'
+    : (profiles[assignedUid]?.name?.split(' ')[0] || 'Partner');
+  const banner = document.createElement('div');
+  banner.className = 'rotation-banner';
+  banner.innerHTML = `
+    <div class="rotation-info">
+      <div class="label">This week's ${room.name}</div>
+      <div class="assigned">${isMyRoom ? '👤 Your turn' : `👥 ${assignedName}'s turn`}</div>
+    </div>
+    <button class="swap-btn" onclick="swapRoom('${activeRoom}')">⇄ Swap</button>
+  `;
+  content.appendChild(banner);
+
+  // Group tasks by freq
+  const freqs = [
+    { key:'daily',   label:'Daily',   days:1  },
+    { key:'weekly',  label:'Weekly',  days:7  },
+    { key:'monthly', label:'Monthly', days:30 },
+    { key:'custom',  label:'Custom',  days:null },
+  ];
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  freqs.forEach(f => {
+    let roomTasks = tasks.filter(t => t.room === activeRoom && t.freq === f.key);
+    if (myTasksOnly) roomTasks = roomTasks.filter(t => getEffectiveAssignee(t, rotation, myUid) === myUid || getEffectiveAssignee(t, rotation, myUid) === 'shared');
+    if (!roomTasks.length) return;
+
+    const sec = document.createElement('div');
+    const hdr = document.createElement('div');
+    hdr.className = 'freq-header';
+    hdr.innerHTML = `<span class="freq-badge ${f.key}">${f.label}</span><div class="freq-line"></div>`;
+    sec.appendChild(hdr);
+
+    roomTasks.forEach(task => {
+      const card = buildTaskCard(task, rotation, myUid, partnerUid, profiles, today);
+      sec.appendChild(card);
+    });
+
+    // Quick add
+    const addRow = document.createElement('div');
+    addRow.className = 'add-task-row';
+    const inp = document.createElement('input');
+    inp.className = 'add-task-input';
+    inp.placeholder = `+ Quick add ${f.label.toLowerCase()} task…`;
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && inp.value.trim()) quickAddTask(inp.value.trim(), f.key, f.days || 7);
+    });
+    addRow.appendChild(inp);
+    sec.appendChild(addRow);
+    content.appendChild(sec);
+  });
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-full-btn';
+  addBtn.textContent = '+ Add Task';
+  addBtn.onclick = () => openAddTask(activeRoom);
+  content.appendChild(addBtn);
+}
+
+function getEffectiveAssignee(task, rotation, myUid) {
+  if (task.assignOverride === 'me')     return myUid;
+  if (task.assignOverride === 'them')   return 'them';
+  if (task.assignOverride === 'shared') return 'shared';
+  return rotation[task.room] || 'shared';
+}
+
+function buildTaskCard(task, rotation, myUid, partnerUid, profiles, today) {
+  const assignee = getEffectiveAssignee(task, rotation, myUid);
+  const isMe     = assignee === myUid;
+  const isShared = assignee === 'shared';
+  const snoozed  = task.snoozedUntil && new Date(task.snoozedUntil) > today;
+
+  const card = document.createElement('div');
+  let cls = 'task-card';
+  if (task.done) cls += ' done';
+  if (isMe)      cls += ' mine';
+  else if (isShared) cls += ' shared';
+  else           cls += ' theirs';
+  if (myTasksOnly && !isMe && !isShared) cls += ' dimmed';
+  card.className = cls;
+
+  const check = document.createElement('div');
+  check.className = 'task-check' + (task.done ? ' checked' : '');
+  check.onclick = () => toggleTask(task.id);
+
+  const partnerName = partnerUid ? (profiles[partnerUid]?.name?.split(' ')[0] || 'Partner') : 'Partner';
+  let assignTag = '';
+  if (task.assignOverride === 'me')     assignTag = `<span class="tag assign-me">Always me</span>`;
+  else if (task.assignOverride === 'them') assignTag = `<span class="tag assign-them">Always ${partnerName}</span>`;
+  else if (task.assignOverride === 'shared') assignTag = `<span class="tag assign-share">Shared</span>`;
+
+  let metaExtra = '';
+  if (snoozed) metaExtra = `<span class="tag snoozed">💤 until ${task.snoozedUntil}</span>`;
+  if (task.freq === 'custom') metaExtra += `<span class="tag" style="background:#f5e8ff;color:#7a4a8a">Every ${task.intervalDays}d</span>`;
+
+  const info = document.createElement('div');
+  info.className = 'task-info';
+  info.innerHTML = `<div class="task-name">${task.name}</div><div class="task-meta">${assignTag}${metaExtra}</div>`;
+
+  const actions = document.createElement('div');
+  actions.className = 'task-actions';
+  const snoozeBtn = document.createElement('button');
+  snoozeBtn.className = 'icon-btn'; snoozeBtn.title = 'Snooze'; snoozeBtn.textContent = '💤';
+  snoozeBtn.onclick = () => openSnooze(task.id);
+  const pinBtn = document.createElement('button');
+  pinBtn.className = 'icon-btn'; pinBtn.title = 'Change assignment'; pinBtn.textContent = '📌';
+  pinBtn.onclick = () => cycleAssignment(task.id);
+  const delBtn = document.createElement('button');
+  delBtn.className = 'icon-btn'; delBtn.title = 'Delete'; delBtn.textContent = '🗑️';
+  delBtn.onclick = () => deleteTask(task.id);
+  actions.append(snoozeBtn, pinBtn, delBtn);
+
+  card.append(check, info, actions);
+  return card;
+}
+
+// ── Plants sidebar + content ─────────────────────────────────────────────────
+function renderPlantSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = `
+    <div class="sidebar-heading">Plant Care</div>
+    <button class="sidebar-btn active" style="pointer-events:none"><span class="sidebar-icon">🌿</span>All Plants</button>
+  `;
+  // Seasonal toggle
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'margin-top:1rem;padding:0 0.2rem';
+  wrap.innerHTML = `
+    <div class="seasonal-wrap" style="flex-direction:column;align-items:flex-start;gap:0.5rem">
+      <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--moss);font-weight:700">Seasonal mode</div>
+      <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;cursor:pointer">
+        <label class="toggle-switch">
+          <input type="checkbox" ${seasonalMode ? 'checked' : ''} onchange="toggleSeasonal(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+        ${seasonalMode ? '❄️ Winter intervals' : '☀️ Summer intervals'}
+      </label>
+    </div>
+  `;
+  sidebar.appendChild(wrap);
+}
+
+function renderPlants() {
+  const content = document.getElementById('content');
+  content.innerHTML = '';
+  const plants = householdDoc?.plants || [];
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  if (!plants.length) {
+    content.innerHTML = '<div class="empty-state"><div class="empty-icon">🌱</div>No plants yet. Add your first one!</div>';
+  } else {
+    plants.forEach(plant => {
+      const card = buildPlantCard(plant, today);
+      content.appendChild(card);
+    });
+  }
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-full-btn green';
+  addBtn.textContent = '+ Add Plant';
+  addBtn.onclick = openAddPlant;
+  content.appendChild(addBtn);
+}
+
+function buildPlantCard(plant, today) {
+  const interval = seasonalMode && plant.winterDays ? plant.winterDays : plant.waterEveryDays;
+  let dueLabel = 'No watering date set';
+  let dueClass = 'ok';
+  if (plant.lastWatered) {
+    const last = new Date(plant.lastWatered); last.setHours(0,0,0,0);
+    const next = new Date(last); next.setDate(next.getDate() + interval);
+    const diff = Math.round((next - today) / 86400000);
+    if (diff < 0)      { dueLabel = `Overdue by ${Math.abs(diff)} day${Math.abs(diff)!==1?'s':''}`;  dueClass = 'overdue'; }
+    else if (diff === 0){ dueLabel = 'Water today!'; dueClass = 'soon'; }
+    else if (diff <= 2) { dueLabel = `Due in ${diff} day${diff!==1?'s':''}`; dueClass = 'soon'; }
+    else                { dueLabel = `Due in ${diff} days`; dueClass = 'ok'; }
+  }
+
+  const card = document.createElement('div');
+  card.className = 'plant-card';
+  card.innerHTML = `
+    <div class="plant-emoji">${plant.emoji || '🌿'}</div>
+    <div class="plant-info">
+      <div class="plant-name">${plant.name}</div>
+      ${plant.species ? `<div class="plant-species">${plant.species}</div>` : ''}
+      <div class="plant-meta">
+        <span class="plant-due ${dueClass}">${dueLabel}</span>
+        <span class="tag" style="background:#edf5e8;color:#3d5c33">Every ${interval}d</span>
+      </div>
+      ${plant.notes ? `<div class="plant-tip">💡 ${plant.notes}</div>` : ''}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.4rem;align-items:flex-end">
+      <button class="water-btn" onclick="waterPlant('${plant.id}')">💧 Watered</button>
+      <button class="icon-btn" onclick="deletePlant('${plant.id}')" style="font-size:0.8rem">🗑️</button>
+    </div>
+  `;
+  return card;
+}
+
+// ── Task actions ─────────────────────────────────────────────────────────────
+async function toggleTask(id) {
+  const tasks = [...(householdDoc.tasks || [])];
+  const t = tasks.find(x => x.id === id); if (!t) return;
+  t.done = !t.done;
+  if (t.done) { t.snoozedUntil = null; t.lastCompleted = new Date().toISOString().split('T')[0]; }
+  await saveHousehold({ tasks });
+  if (t.done) toast('✓ Done!');
+}
+
+async function deleteTask(id) {
+  const tasks = (householdDoc.tasks || []).filter(x => x.id !== id);
+  await saveHousehold({ tasks }); toast('Task removed.');
+}
+
+async function quickAddTask(name, freq, intervalDays) {
+  const tasks = [...(householdDoc.tasks || [])];
+  tasks.push({ id: 't'+Date.now(), room: activeRoom, name, freq, intervalDays, done: false, snoozedUntil: null, assignOverride: 'rotation', lastCompleted: null });
+  await saveHousehold({ tasks }); toast('Task added!');
+}
+
+async function cycleAssignment(id) {
+  const tasks = [...(householdDoc.tasks || [])];
+  const t = tasks.find(x => x.id === id); if (!t) return;
+  const cycle = ['rotation','me','them','shared'];
+  const idx = cycle.indexOf(t.assignOverride || 'rotation');
+  t.assignOverride = cycle[(idx+1) % cycle.length];
+  await saveHousehold({ tasks });
+  toast(`Assignment: ${t.assignOverride}`);
+}
+
+async function swapRoom(roomId) {
+  const members = householdDoc.members || [];
+  if (members.length < 2) { toast('No partner in household yet.'); return; }
+  const rotation = { ...householdDoc.roomRotation };
+  const current = rotation[roomId];
+  rotation[roomId] = members.find(m => m !== current) || current;
+  await saveHousehold({ roomRotation: rotation });
+  toast('Room swapped!');
+}
+
+window.toggleTask  = toggleTask;
+window.deleteTask  = deleteTask;
+window.swapRoom    = swapRoom;
+
+// ── Snooze ───────────────────────────────────────────────────────────────────
+window.openSnooze = (id) => {
+  snoozeTargetId = id;
+  const d = new Date(); d.setDate(d.getDate()+1);
+  document.getElementById('snoozeDate').value = d.toISOString().split('T')[0];
+  openModal('snoozeModal');
+};
+window.confirmSnooze = async () => {
+  const d = document.getElementById('snoozeDate').value; if (!d) return;
+  const tasks = [...(householdDoc.tasks||[])];
+  const t = tasks.find(x => x.id === snoozeTargetId); if (!t) return;
+  t.snoozedUntil = d; t.done = false;
+  await saveHousehold({ tasks }); closeModal('snoozeModal'); toast('💤 Snoozed.');
+};
+
+// ── Add Task modal ────────────────────────────────────────────────────────────
+window.openAddTask = (roomId) => {
+  addTaskRoomId = roomId;
+  document.getElementById('newTaskName').value = '';
+  document.getElementById('newTaskFreq').value = 'weekly';
+  document.getElementById('newTaskAssign').value = 'rotation';
+  document.getElementById('customDaysWrap').style.display = 'none';
+  openModal('addTaskModal');
+  setTimeout(() => document.getElementById('newTaskName').focus(), 100);
+};
+window.toggleCustomDays = () => {
+  const v = document.getElementById('newTaskFreq').value;
+  document.getElementById('customDaysWrap').style.display = v === 'custom' ? 'block' : 'none';
+};
+window.confirmAddTask = async () => {
+  const name  = document.getElementById('newTaskName').value.trim(); if (!name) return;
+  const freq  = document.getElementById('newTaskFreq').value;
+  const assignOverride = document.getElementById('newTaskAssign').value;
+  let intervalDays = freq === 'daily' ? 1 : freq === 'weekly' ? 7 : freq === 'monthly' ? 30 :
+    parseInt(document.getElementById('newTaskDays').value) || 7;
+  const tasks = [...(householdDoc.tasks||[])];
+  tasks.push({ id:'t'+Date.now(), room: addTaskRoomId, name, freq, intervalDays, done:false, snoozedUntil:null, assignOverride, lastCompleted:null });
+  await saveHousehold({ tasks }); closeModal('addTaskModal'); toast('Task added!');
+};
+
+// ── Add Room ─────────────────────────────────────────────────────────────────
+window.openAddRoom = () => {
+  document.getElementById('newRoomName').value = '';
+  document.getElementById('newRoomIcon').value = '';
+  openModal('addRoomModal');
+  setTimeout(() => document.getElementById('newRoomName').focus(), 100);
+};
+window.confirmAddRoom = async () => {
+  const name = document.getElementById('newRoomName').value.trim(); if (!name) return;
+  const icon = document.getElementById('newRoomIcon').value.trim() || '🏠';
+  const id   = name.toLowerCase().replace(/\s+/g,'_') + '_' + Date.now();
+  const rooms = [...(householdDoc.rooms||[])];
+  rooms.push({ id, name, icon });
+  const rotation = { ...householdDoc.roomRotation, [id]: currentUser.uid };
+  activeRoom = id;
+  await saveHousehold({ rooms, roomRotation: rotation }); closeModal('addRoomModal'); toast('Room added!');
+};
+
+// ── Plants ────────────────────────────────────────────────────────────────────
+window.waterPlant = async (id) => {
+  const plants = [...(householdDoc.plants||[])];
+  const p = plants.find(x => x.id === id); if (!p) return;
+  p.lastWatered = new Date().toISOString().split('T')[0];
+  await saveHousehold({ plants }); toast('💧 Watered!');
+};
+window.deletePlant = async (id) => {
+  const plants = (householdDoc.plants||[]).filter(x => x.id !== id);
+  await saveHousehold({ plants }); toast('Plant removed.');
+};
+window.toggleSeasonal = async (val) => {
+  seasonalMode = val;
+  await saveHousehold({ seasonalMode: val });
+  render();
+};
+
+window.openAddPlant = () => {
+  document.getElementById('newPlantName').value = '';
+  document.getElementById('newPlantSpecies').value = '';
+  document.getElementById('newPlantEmoji').value = '';
+  document.getElementById('newPlantDays').value = '';
+  document.getElementById('newPlantWinterDays').value = '';
+  document.getElementById('newPlantNotes').value = '';
+  document.getElementById('plantSuggestions').style.display = 'none';
+  openModal('addPlantModal');
+  setTimeout(() => document.getElementById('newPlantName').focus(), 100);
+};
+
+window.filterPlantSuggestions = () => {
+  const q = document.getElementById('newPlantName').value.trim().toLowerCase();
+  const box = document.getElementById('plantSuggestions');
+  if (!q || q.length < 2) { box.style.display = 'none'; return; }
+  const matches = plantDb.filter(p =>
+    p.name.toLowerCase().includes(q) || p.species.toLowerCase().includes(q)
+  ).slice(0, 6);
+  if (!matches.length) { box.style.display = 'none'; return; }
+  box.innerHTML = matches.map(p => `
+    <div class="plant-suggestion" onclick="selectPlantSuggestion(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+      <span>${p.emoji}</span>
+      <div><div>${p.name}</div><div class="ps-species">${p.species}</div></div>
+    </div>
+  `).join('');
+  box.style.display = 'block';
+};
+
+window.selectPlantSuggestion = (p) => {
+  document.getElementById('newPlantName').value = p.name;
+  document.getElementById('newPlantSpecies').value = p.species;
+  document.getElementById('newPlantEmoji').value = p.emoji;
+  document.getElementById('newPlantDays').value = p.waterDays;
+  document.getElementById('newPlantWinterDays').value = p.winterDays || '';
+  document.getElementById('newPlantNotes').value = p.notes || '';
+  document.getElementById('plantSuggestions').style.display = 'none';
+};
+
+window.confirmAddPlant = async () => {
+  const name = document.getElementById('newPlantName').value.trim(); if (!name) return;
+  const plants = [...(householdDoc.plants||[])];
+  plants.push({
+    id: 'p' + Date.now(),
+    name,
+    species:       document.getElementById('newPlantSpecies').value.trim(),
+    emoji:         document.getElementById('newPlantEmoji').value.trim() || '🌿',
+    waterEveryDays: parseInt(document.getElementById('newPlantDays').value) || 7,
+    winterDays:    parseInt(document.getElementById('newPlantWinterDays').value) || null,
+    notes:         document.getElementById('newPlantNotes').value.trim(),
+    lastWatered:   null,
+  });
+  await saveHousehold({ plants }); closeModal('addPlantModal'); toast('Plant added!');
+};
+
+// ── Week-end modal ────────────────────────────────────────────────────────────
+function showWeekEndModal(unchecked) {
+  const ul = document.getElementById('uncheckedList');
+  ul.innerHTML = '';
+  unchecked.forEach(t => {
+    const room = (householdDoc.rooms||[]).find(r => r.id === t.room);
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${room?.icon||''}</span><span>${t.name}</span><span style="margin-left:auto;font-size:0.7rem;color:#aaa">${t.freq}</span>`;
+    ul.appendChild(li);
+  });
+  openModal('weekEndModal');
+}
+window.handleUnchecked = async (action) => {
+  const today = new Date();
+  const tasks = (householdDoc.tasks||[]).map(t => {
+    if (!t.done && !t.snoozedUntil) {
+      if (action === 'clear') return { ...t, done: true };
+      if (action === 'snooze') {
+        const d = new Date(today); d.setDate(d.getDate()+3);
+        return { ...t, snoozedUntil: d.toISOString().split('T')[0] };
+      }
+    }
+    return t;
+  });
+  await saveHousehold({ tasks }); closeModal('weekEndModal');
+};
+
+// ── Mode / filter toggles ─────────────────────────────────────────────────────
+window.switchMode = (m) => {
+  mode = m;
+  document.getElementById('tabCleaning').className = 'mode-tab' + (m==='cleaning'?' active':'');
+  document.getElementById('tabPlants').className   = 'mode-tab' + (m==='plants'  ?' active':'');
+  render();
+};
+window.toggleMyTasks = () => { myTasksOnly = !myTasksOnly; render(); };
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function show(id) {
+  ['authScreen','householdScreen','appShell'].forEach(s => {
+    const el = document.getElementById(s);
+    el.style.display = s === id ? (s === 'appShell' ? 'flex' : 'flex') : 'none';
+  });
+  if (id === 'householdScreen') {
+    document.getElementById('householdScreen').style.display = 'flex';
+  }
+}
+
+window.openModal  = (id) => document.getElementById(id).classList.add('open');
+window.closeModal = (id) => document.getElementById(id).classList.remove('open');
+document.querySelectorAll('.modal-overlay').forEach(el =>
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); })
+);
+
+let toastTimer;
+window.toast = (msg) => {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2300);
+};
+
+</script>
+</body>
+</html>
