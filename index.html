@@ -62,7 +62,7 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     text-align: center;
-    margin-top: -1.5rem;
+    margin-top: 0;
   }
   .auth-card {
     background: var(--mist);
@@ -338,11 +338,10 @@
   .sidebar {
     border-right: 1.5px solid var(--parchment);
     padding: 1.5rem 1rem;
-    position: sticky;
-    top: 120px;
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+    align-self: stretch;
   }
   .sidebar-heading {
     font-size: 0.65rem;
@@ -647,9 +646,9 @@
 
 <!-- ── Auth Screen ── -->
 <div id="authScreen">
-  <div>
-    <div class="auth-logo">Flourish<span>.</span></div>
-    <div class="auth-tagline">Home & Garden, Together</div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0.8rem">
+    <img src="Flourish.png" alt="Flourish" style="width:120px;height:120px;border-radius:26px;box-shadow:0 4px 24px rgba(0,0,0,0.18)">
+    <div class="auth-tagline" style="margin-top:0">Home &amp; Garden, Together</div>
   </div>
   <div class="auth-card">
     <h2>Welcome</h2>
@@ -663,7 +662,7 @@
 
 <!-- ── Household Setup Screen ── -->
 <div id="householdScreen" style="display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;padding:2rem;">
-  <div class="auth-logo" style="font-size:2.2rem">Flourish<span style="color:var(--clay)">.</span></div>
+  <img src="Flourish.png" alt="Flourish" style="width:80px;height:80px;border-radius:18px;box-shadow:0 3px 14px rgba(0,0,0,0.15)">
 
   <div class="household-card" id="householdCreate" style="display:block">
     <h2>Set up your home</h2>
@@ -692,7 +691,7 @@
 <div id="appShell" style="display:none;flex-direction:column;min-height:100vh">
 
   <div class="topbar">
-    <div class="app-logo">Flourish<span>.</span></div>
+    <div style="display:flex;align-items:center;gap:0.6rem"><img src="Flourish.png" alt="Flourish" style="width:34px;height:34px;border-radius:8px"><span class="app-logo" style="font-size:1.4rem">Flourish<span>.</span></span></div>
     <div class="mode-tabs">
       <button class="mode-tab active" id="tabCleaning" onclick="switchMode('cleaning')">🧹 Cleaning</button>
       <button class="mode-tab" id="tabPlants" onclick="switchMode('plants')">🌿 Plants</button>
@@ -1413,21 +1412,99 @@ window.openAddPlant = () => {
   setTimeout(() => document.getElementById('newPlantName').focus(), 100);
 };
 
+const PERENUAL_KEY = 'sk-ak4Z69ccae069ccb916020';
+let perenualTimer = null;
+
 window.filterPlantSuggestions = () => {
-  const q = document.getElementById('newPlantName').value.trim().toLowerCase();
+  const q = document.getElementById('newPlantName').value.trim();
   const box = document.getElementById('plantSuggestions');
   if (!q || q.length < 2) { box.style.display = 'none'; return; }
-  const matches = plantDb.filter(p =>
-    p.name.toLowerCase().includes(q) || p.species.toLowerCase().includes(q)
-  ).slice(0, 6);
-  if (!matches.length) { box.style.display = 'none'; return; }
-  box.innerHTML = matches.map(p => `
-    <div class="plant-suggestion" onclick="selectPlantSuggestion(${JSON.stringify(p).replace(/"/g,'&quot;')})">
-      <span>${p.emoji}</span>
-      <div><div>${p.name}</div><div class="ps-species">${p.species}</div></div>
-    </div>
-  `).join('');
-  box.style.display = 'block';
+
+  // Show local matches instantly
+  const local = plantDb.filter(p =>
+    p.name.toLowerCase().includes(q.toLowerCase()) ||
+    p.species.toLowerCase().includes(q.toLowerCase())
+  ).slice(0, 4);
+
+  const renderLocal = (items) => {
+    if (!items.length) { box.style.display = 'none'; return; }
+    box.innerHTML = items.map(p => `
+      <div class="plant-suggestion" onclick="selectPlantSuggestion(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+        <span>${p.emoji || '🌿'}</span>
+        <div><div>${p.name}</div><div class="ps-species">${p.species || ''}</div></div>
+      </div>
+    `).join('') + '<div style="font-size:0.7rem;color:#b09070;padding:0.3rem 0.85rem">Searching Perenual…</div>';
+    box.style.display = 'block';
+  };
+
+  renderLocal(local);
+
+  // Debounce Perenual API call
+  clearTimeout(perenualTimer);
+  perenualTimer = setTimeout(async () => {
+    try {
+      const res = await fetch(`https://perenual.com/api/species-list?key=${PERENUAL_KEY}&q=${encodeURIComponent(q)}&indoor=1`);
+      const data = await res.json();
+      if (!data.data?.length) { if (local.length) renderLocal(local); return; }
+
+      const apiResults = data.data.slice(0, 6).map(p => ({
+        name: p.common_name || p.scientific_name?.[0] || q,
+        species: p.scientific_name?.[0] || '',
+        emoji: '🌿',
+        waterDays: watercycleTodays(p.watering),
+        winterDays: watercycleTodays(p.watering, true),
+        light: p.sunlight?.[0] || '',
+        notes: '',
+        _perenualId: p.id,
+        _img: (typeof p.default_image?.thumbnail === 'string' && !p.default_image.thumbnail.includes('upgrade')) ? p.default_image.thumbnail : null,
+      }));
+
+      box.innerHTML = apiResults.map(p => `
+        <div class="plant-suggestion" onclick="selectPlantSuggestion(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+          ${p._img ? `<img src="${p._img}" style="width:28px;height:28px;border-radius:5px;object-fit:cover;flex-shrink:0">` : `<span>${p.emoji}</span>`}
+          <div><div>${p.name}</div><div class="ps-species">${p.species}</div></div>
+        </div>
+      `).join('');
+      box.style.display = 'block';
+
+      // Fetch care detail for top result if we select it later
+    } catch(e) {
+      // API failed silently — local results already shown
+      renderLocal(local);
+    }
+  }, 500);
+};
+
+function watercycleTodays(watering, winter = false) {
+  const map = { 'Frequent': winter ? 4 : 3, 'Average': winter ? 12 : 7, 'Minimum': winter ? 28 : 18, 'None': winter ? 60 : 45 };
+  return map[watering] || (winter ? 14 : 7);
+}
+
+window.selectPlantSuggestion = async (p) => {
+  document.getElementById('newPlantName').value = p.name;
+  document.getElementById('newPlantSpecies').value = p.species || '';
+  document.getElementById('newPlantEmoji').value = p.emoji || '🌿';
+  document.getElementById('newPlantDays').value = p.waterDays || 7;
+  document.getElementById('newPlantWinterDays').value = p.winterDays || '';
+  document.getElementById('newPlantNotes').value = p.notes || '';
+  document.getElementById('plantSuggestions').style.display = 'none';
+
+  // If it came from Perenual, fetch full care detail
+  if (p._perenualId) {
+    try {
+      const res = await fetch(`https://perenual.com/api/species/details/${p._perenualId}?key=${PERENUAL_KEY}`);
+      const d = await res.json();
+      if (d.care_guides) {
+        // care_guides is a URL — fetch it
+        const cg = await fetch(`${d.care_guides}&key=${PERENUAL_KEY}`);
+        const cgData = await cg.json();
+        const watering = cgData.data?.find(g => g.type === 'watering');
+        if (watering?.description) {
+          document.getElementById('newPlantNotes').value = watering.description.slice(0, 200);
+        }
+      }
+    } catch(e) { /* silently skip */ }
+  }
 };
 
 window.selectPlantSuggestion = (p) => {
